@@ -98,21 +98,27 @@ def tobs():
 @app.route("/api/v1.0/<start>")
 # When given the start only, calculate TMIN, TAVG, and TMAX for all dates greater than and equal to the start date.
 
-def start():
+def start(start):
     session = Session(engine)
-    recent = session.query(msmt.date).order_by(msmt.date.desc()).first()
+    date_query = session.query(msmt.date)
     session.close()
-    #minimum temperature of all days selected.
-    #average temperature of all days selected.
-    #maximum temperature of all days selected.
+    dates = [date_query[i] for i in range(0, len(date_query))]
+    dates_list = [dt.datetime.strptime(date, '"%Y-%m-%d"').date() for date in dates]
+    dates_temp = [msmt.dates,msmt.tobs]
+    dates_above = session.query(*msmt.dates).\
+                                            filter(msmt.dates>=start)
+    return jsonify(date_above)
 
 @app.route("/api/v1.0/<start>/<end>")
 # When given the start and the end date, calculate the TMIN, TAVG, and TMAX for dates between the start and end date inclusive.
 
-def start_end():
+def start_end(start, end):
     session = Session(engine)
-    recent = session.query(msmt.date).order_by(msmt.date.desc()).first()
+    dates = session.query(*msmt.date).\
+                                        filter(msmt.date >= start and msmt.date <= end).all()
     session.close()
+    list(dates)
+    return jsonify(dates)
 
 if(__name__=='__main__'):
     app.run(debug=True)
