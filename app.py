@@ -61,15 +61,21 @@ def precipitation():
     results = session.query(msmt.date, msmt.prcp).all()
     session.close()
     prec = list(np.ravel(results))
-    res_dct = {prec[i]: prec[i + 1] for i in range(0, len(prec), 2)}
-    print(res_dct)
-    return jsonify(res_dct)
-    
-@app.route("/api/v1.0/stations")
-# Return a JSON list of stations from the dataset.
+    dct = {prec[i]: prec[i + 1] for i in range(0, len(prec))}
+    print(dct)
+    return jsonify(dct)
 
+# Return a JSON list of stations from the dataset.   
+@app.route("/api/v1.0/stations")
 def stations():
-    print('stations')
+    session = Session(engine)
+    results = session.query(stat.name).all()
+    session.close()
+    stat_list = list(np.ravel(results))
+    dalist = [str(stat_list[i]) for i in range(0, len(stat_list))]
+    print(dalist)
+    return jsonify(dalist)
+
 
 
 @app.route("/api/v1.0/tobs")
