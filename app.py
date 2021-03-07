@@ -100,25 +100,21 @@ def tobs():
 
 def start(start):
     session = Session(engine)
-    date_query = session.query(msmt.date)
+    date_query = session.query(msmt.date).filter(msmt.date >= start)
     session.close()
-    dates = [date_query[i] for i in range(0, len(date_query))]
-    dates_list = [dt.datetime.strptime(date, '"%Y-%m-%d"').date() for date in dates]
-    dates_temp = [msmt.dates,msmt.tobs]
-    dates_above = session.query(*msmt.dates).\
-                                            filter(msmt.dates>=start)
-    return jsonify(date_above)
+    readable = dt.datetime.strptime(date_query, '%Y-%m-%d').date()
+    return jsonify(readable)
 
 @app.route("/api/v1.0/<start>/<end>")
 # When given the start and the end date, calculate the TMIN, TAVG, and TMAX for dates between the start and end date inclusive.
 
 def start_end(start, end):
     session = Session(engine)
-    dates = session.query(*msmt.date).\
-                                        filter(msmt.date >= start and msmt.date <= end).all()
+    date_query = session.query(msmt.date).filter(msmt.date >= start).\
+        filter(msmt.date <= end)
     session.close()
-    list(dates)
-    return jsonify(dates)
+    print(date_query)
+    return jsonify(date_query)
 
 if(__name__=='__main__'):
     app.run(debug=True)
