@@ -102,8 +102,7 @@ def start(start):
     session = Session(engine)
     date_query = session.query(msmt.date).filter(msmt.date >= start)
     session.close()
-    readable = dt.datetime.strptime(date_query, '%Y-%m-%d').date()
-    return jsonify(readable)
+    return jsonify(date_query)
 
 @app.route("/api/v1.0/<start>/<end>")
 # When given the start and the end date, calculate the TMIN, TAVG, and TMAX for dates between the start and end date inclusive.
