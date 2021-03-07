@@ -99,13 +99,18 @@ def tobs():
 # When given the start only, calculate TMIN, TAVG, and TMAX for all dates greater than and equal to the start date.
 
 def start():
-    print('start')
+    session = Session(engine)
+    recent = session.query(msmt.date).order_by(msmt.date.desc()).first()
+    session.close()
+
 
 @app.route("/api/v1.0/<start>/<end>")
 # When given the start and the end date, calculate the TMIN, TAVG, and TMAX for dates between the start and end date inclusive.
 
 def start_end():
-    print('start to end')
+    session = Session(engine)
+    recent = session.query(msmt.date).order_by(msmt.date.desc()).first()
+    session.close()
 
 if(__name__=='__main__'):
     app.run(debug=True)
