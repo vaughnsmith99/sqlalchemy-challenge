@@ -1,3 +1,4 @@
+import numpy as np
 
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
@@ -52,22 +53,17 @@ def routes():
             </body>
             </html>)'''
 
-if(__name__=='__main__'):
-    app.run(debug=True)
-
-
 # Convert the query results to a dictionary using date as the key and prcp as the value.
 # Return the JSON representation of your dictionary.
 @app.route("/api/v1.0/precipitation")
 def precipitation():
-    prec = {}
     session = Session(engine)
     results = session.query(msmt.date, msmt.prcp).all()
-    for row in results:
-        prec[row[0]] = row[1]
-
     session.close()
-    return jsonify(prec)
+    prec = list(np.ravel(results))
+    res_dct = {prec[i]: prec[i + 1] for i in range(0, len(prec), 2)}
+    print(res_dct)
+    return jsonify(res_dct)
     
 @app.route("/api/v1.0/stations")
 # Return a JSON list of stations from the dataset.
@@ -95,3 +91,6 @@ def start():
 
 def start_end():
     print('start to end')
+
+if(__name__=='__main__'):
+    app.run(debug=True)
