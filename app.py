@@ -102,7 +102,9 @@ def start():
     session = Session(engine)
     recent = session.query(msmt.date).order_by(msmt.date.desc()).first()
     session.close()
-
+    #minimum temperature of all days selected.
+    #average temperature of all days selected.
+    #maximum temperature of all days selected.
 
 @app.route("/api/v1.0/<start>/<end>")
 # When given the start and the end date, calculate the TMIN, TAVG, and TMAX for dates between the start and end date inclusive.
