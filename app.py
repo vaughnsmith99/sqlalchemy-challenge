@@ -1,5 +1,5 @@
 import numpy as np
-
+import datetime as dt
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
@@ -76,14 +76,23 @@ def stations():
     print(dalist)
     return jsonify(dalist)
 
-
-
 @app.route("/api/v1.0/tobs")
 # Query the dates and temperature observations of the most active station for the last year of data.
 # Return a JSON list of temperature observations (TOBS) for the previous year.
 def tobs():
-    print('tobs')
+    session = Session(engine)
+    recent = session.query(msmt.date).order_by(msmt.date.desc()).first()
+    session.close()
+    _12mo = dt.datetime.strptime(recent[0], '%Y-%m-%d').date()
 
+    # Calculate the date one year from the last date in data set.
+    one_yr_ago = _12mo - dt.timedelta(days=365)
+
+    # Perform a query to retrieve the data and precipitation scores
+    msmt_date_tobs = [msmt.date,msmt.tobs]
+    msmt_date_tobs_query = session.query(*msmt_date_tobs).\
+                                                            filter(msmt.date>=one_yr_ago).all()
+    return jsonify(msmt_date_tobs_query)
 
 # Return a JSON list of the minimum temperature, the average temperature, and the max temperature for a given start or start-end range.
 @app.route("/api/v1.0/<start>")
