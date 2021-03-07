@@ -1,0 +1,97 @@
+
+import sqlalchemy
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine, func
+
+from flask import Flask, jsonify
+
+
+#################################################
+# Database Setup
+#################################################
+engine = create_engine("sqlite:///hawaii.sqlite")
+
+# reflect an existing database into a new model
+Base = automap_base()
+# reflect the tables
+Base.prepare(engine, reflect=True)
+
+# Save reference to the table
+msmt = Base.classes.measurement
+stat = Base.classes.station
+
+#################################################
+# Flask Setup
+#################################################
+app = Flask(__name__)
+root_name = "/api/v1.0/"
+
+#################################################
+# Flask Routes
+#################################################
+
+@app.route("/")
+def routes():
+    return f'''
+            <!DOCTYPE HTML>
+            <html>
+            <body>
+            
+            <h1>Welcome to the API for Hawaii Climate!</h1>
+            <h2>Here are the available routes:</h2>
+
+            <ul>
+            <li><a href="{root_name}precipitation">Precipitation - {root_name}precipitation</a></li>
+            <li><a href="{root_name}stations">Stations - {root_name}stations</a></li>
+            <li><a href="{root_name}tobs">Tobs - {root_name}tobs</a></li>
+            <li>If you want to filter by the start date: {root_name}[yyyy-mm-dd]</li>
+            <li>If you want to filter by the start and end dates: {root_name}[yyyy-mm-dd]/[yyyy-mm-dd]</li>
+            </ul>
+
+            </body>
+            </html>)'''
+
+if(__name__=='__main__'):
+    app.run(debug=True)
+
+
+# Convert the query results to a dictionary using date as the key and prcp as the value.
+# Return the JSON representation of your dictionary.
+@app.route("/api/v1.0/precipitation")
+def precipitation():
+    prec = {}
+    session = Session(engine)
+    results = session.query(msmt.date, msmt.prcp).all()
+    for row in results:
+        prec[row[0]] = row[1]
+
+    session.close()
+    return jsonify(prec)
+    
+@app.route("/api/v1.0/stations")
+# Return a JSON list of stations from the dataset.
+
+def stations():
+    print('stations')
+
+
+@app.route("/api/v1.0/tobs")
+# Query the dates and temperature observations of the most active station for the last year of data.
+# Return a JSON list of temperature observations (TOBS) for the previous year.
+def tobs():
+    print('tobs')
+
+
+# Return a JSON list of the minimum temperature, the average temperature, and the max temperature for a given start or start-end range.
+@app.route("/api/v1.0/<start>")
+# When given the start only, calculate TMIN, TAVG, and TMAX for all dates greater than and equal to the start date.
+
+def start():
+    print('start')
+
+@app.route("/api/v1.0/<start>/<end>")
+# When given the start and the end date, calculate the TMIN, TAVG, and TMAX for dates between the start and end date inclusive.
+
+def start_end():
+    print('start to end')
